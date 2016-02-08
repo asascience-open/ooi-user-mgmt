@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/asascience-open/ooi-user-mgmt.svg?branch=master)](https://travis-ci.org/asascience-open/ooi-user-mgmt)
-
-ooi-ui-services
+ooi-user-mgmt
 ===============
 
 Ocean Observatories Initiative - User Management
