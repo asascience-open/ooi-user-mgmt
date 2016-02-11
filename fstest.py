@@ -5,12 +5,10 @@ from flask.ext.security import current_user, login_required, RoleMixin, Security
 from flask_security.utils import encrypt_password
 from flask_environments import Environments
 from flask_mail import Mail
-# from flask.ext.admin import Admin
 from flask.ext import login
 from flask.ext.admin.base import MenuLink, Admin, BaseView, expose
 from flask.ext.admin.contrib import sqla
 from wtforms import PasswordField
-import yaml
 import os
 from collections import OrderedDict
 from datetime import datetime
@@ -22,14 +20,8 @@ app = Flask(__name__)
 
 # Import the config.yml or config_local.yml file and load it into the app environment
 basedir = os.path.abspath(os.path.dirname(__file__))
-if os.path.exists(os.path.join(basedir, '/config_local.yml')):
-    with open(basedir + '/config_local.yml', 'r') as f:
-        doc = yaml.load(f)
-else:
-    with open(basedir + '/config.yml', 'r') as f:
-        doc = yaml.load(f)
+env = Environments(app, default_env='PRODUCTION')
 
-env = Environments(app, default_env=doc['ENV_NAME'])
 if os.path.exists(os.path.join(basedir, 'config_local.yml')):
     env.from_yaml(os.path.join(basedir, 'config_local.yml'))
 else:
@@ -110,9 +102,7 @@ class Role(db.Model, RoleMixin):
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
-    # roles_users = db.relationship(u'RolesUsers')
-    # __str__ is required by Flask-Admin, so we can have human-readable values for the Role when editing a User.
-    # If we were using Python 2.7, this would be __unicode__ instead.
+    # __unicode__ is required by Flask-Admin, so we can have human-readable values for the Role when editing a User.
     def __unicode__(self):
         return self.name
 
@@ -187,9 +177,6 @@ class UserScope(db.Model, DictSerializableMixin):
     def __unicode__(self):
         return self.scope_name
 
-    # def __repr__(self):
-    #     return '<Scope ID: %r, Scope Name: %s>' % (self.id, self.scope_name)
-
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -231,6 +218,7 @@ class User(UserMixin, db.Model):
     def password(self, plaintext):
         self._password = encrypt_password(plaintext)
 
+
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
@@ -240,48 +228,33 @@ security = Security(app, user_datastore)
 @app.before_first_request
 def before_first_request():
 
-    # Create any database tables that don't exist yet.
-    # db.create_all()
-
-    # Create the Roles "admin" and "end-user" -- unless they already exist
+    # Create the Roles
     user_datastore.find_or_create_role(name='admin', description='Administrator')
-    user_datastore.find_or_create_role(name='end-user', description='End user')
+    user_datastore.find_or_create_role(name='marine-operator', description='Marine Operator')
+    user_datastore.find_or_create_role(name='science-user', description='Science User')
     user_datastore.find_or_create_role(name='redis', description='Redis User')
 
-    # Create two Users for testing purposes -- unless they already exists.
-    # In each case, use Flask-Security utility function to encrypt the password.
-
     encrypted_password = utils.encrypt_password('password')
+    toemail = app.config['TOEMAIL']
 
-
-    # if not user_datastore.get_user('someone@example.com'):
-    #     user_datastore.create_user(email='someone@example.com',
-    #                                _password='password',
-    #                                user_name='someone@example.com',
-    #                                user_id='someone@example.com',
-    #                                email_opt_in=True,
-    #                                organization_id=1,
-    #                                first_name='Some',
-    #                                last_name='One')
-    if not user_datastore.get_user('admin@ooi.rutgers.edu'):
-        user_datastore.create_user(email='admin@ooi.rutgers.edu',
+    if not user_datastore.get_user(toemail):
+        user_datastore.create_user(email=toemail,
                                    _password='password',
-                                   user_name='admin@ooi.rutgers.edu',
-                                   user_id='admin@ooi.rutgers.edu',
+                                   user_name=toemail,
+                                   user_id=toemail,
                                    email_opt_in=True,
                                    organization_id=1,
                                    first_name='The',
                                    last_name='Admin')
 
-    # Commit any database changes; the User and Roles must exist before we can add a Role to the User
+    # Commit
     db.session.commit()
 
-    # Give one User has the "end-user" role, while the other has the "admin" role. (This will have no effect if the
-    # Users already have these Roles.) Again, commit any database changes.
-    # user_datastore.add_role_to_user('someone@example.com', 'end-user')
-    # user_datastore.add_role_to_user('admin@example.com', 'admin')
+    # Add the default Roles
     user_datastore.add_role_to_user('admin@ooi.rutgers.edu', 'admin')
     user_datastore.add_role_to_user('admin@ooi.rutgers.edu', 'redis')
+
+    # Commit
     db.session.commit()
 
 
@@ -352,6 +325,7 @@ class UserAdmin(sqla.ModelView):
             # the existing password in the database will be retained.
             model._password = utils.encrypt_password(model.password2)
 
+
 # Customized Role model for SQL-Admin
 class RoleAdmin(sqla.ModelView):
 
@@ -363,7 +337,7 @@ class RoleAdmin(sqla.ModelView):
         return current_user.has_role('admin')
 
 # Initialize Flask-Admin
-admin = Admin(app)
+admin = Admin(app, name='OOI User Admin')
 
 # Add Flask-Admin views for Users and Roles
 admin.add_view(UserAdmin(User, db.session))
@@ -375,9 +349,11 @@ class AuthenticatedMenuLink(MenuLink):
     def is_accessible(self):
         return current_user.is_authenticated
 
+
 class NotAuthenticatedMenuLink(MenuLink):
     def is_accessible(self):
         return not current_user.is_authenticated
+
 
 class ResetMenuLink(MenuLink):
     def is_accessible(self):
@@ -390,35 +366,31 @@ class RedisView(rediscli.RedisCli):
         return current_user.has_role('redis')
 
 
-
-
 # Adds redis-cli view
 redis_host = app.config['REDIS_URL'].split('://')[1].split(':')[0]
 redis_port = app.config['REDIS_URL'].rsplit(':', 1)[1]
 r = Redis(host=redis_host, port=redis_port)
-
-# admin.add_view(rediscli.RedisCli(Redis(host=redis_host, port=redis_port)))
 admin.add_view(RedisView(r, name='Redis CLI'))
-# admin.add_link(AuthenticatedMenuLink(name='Redis', endpoint='admin'))
 
-# Add login link by endpoint
+# Add login link
 admin.add_link(NotAuthenticatedMenuLink(name='Login',
                                         endpoint='login_view'))
 
-# Add logout link by endpoint
+# Add logout link
 admin.add_link(AuthenticatedMenuLink(name='Logout',
                                          endpoint='logout_view'))
 
+# Add reset password
 admin.add_link(ResetMenuLink(name='Reset Password',
                                          endpoint='reset_password'))
 
-
+# Add OOI link
 admin.add_link(MenuLink(name='OOI Home Page', category='Links', url='http://ooinet.oceanobservatories.org/'))
 
-# If running locally, listen on all IP addresses, port 5001
+# Run the App
 if __name__ == '__main__':
     app.run(
-        host='0.0.0.0',
-        port=int('5001'),
+        host=app.config['HOST'],
+        port=app.config['PORT'],
         debug=app.config['DEBUG']
     )
