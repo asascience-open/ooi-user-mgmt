@@ -157,7 +157,9 @@ class UserScope(db.Model, DictSerializableMixin):
             'user_admin',
             'annotate',
             'command_control',
-            'organization'
+            'organization',
+            'sys_admin',
+            'data_manager'
             }
         for s in scopes:
             scope = UserScope.query.filter_by(scope_name=s).first()
