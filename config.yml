@@ -4,10 +4,10 @@ COMMON: &common
     # Logging
     LOGGING: True
     LOG_FILE_PTAH: '/logs/'
-    LOG_FILE: 'ooiservices.log'
+    LOG_FILE: 'ooi-ui-mgmt.log'
     # Server config
     DEPLOYMENT_SCENARIO: LOCAL_DEVELOPMENT
-    SECRET_KEY: 'ccdf5de08ac74855bda3e7e309d871e5'
+    SECRET_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     UI_API_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     SSL_DISABLE: False
     JSONIFY_PRETTYPRINT_REGULAR: true
@@ -16,56 +16,13 @@ COMMON: &common
     SQLALCHEMY_RECORD_QUERIES: True
     OOI_SLOW_DB_QUERY_TIME: 0.5
     DB_SCHEMA: 'ooiui'
-    WHOOSH_BASE: 'ooiservices/whoosh_index'
     # server dns/port config
     UI_URL: 'http://localhost:5000'
     SERVER_DNS: 'localhost'
     HOST: localhost
     PORT: 4000
-    # UFrame config
-    UFRAME_URL:             'http://localhost:12576'
-    UFRAME_ASSETS_URL:      'http://localhost:12573'
-    UFRAME_ANNOTATION_URL : 'http://localhost:12580'
-    UFRAME_ALERTS_URL:      'http://localhost:12577'
-    UFRAME_INST_URL:        'http://localhost:12572'
-    UFRAME_ANTELOPE_URL:    'http://localhost:12582/data/list/antelope/'
-    UFRAME_MISSIONS_URL:    'http://localhost:8000'
-    UFRAME_SUBSCRIBE_URL:   'http://localhost:12585'
-    UFRAME_MISSIONS_BASE:   '/missions'
-    UFRAME_ANNOTATION_BASE: '/annotations'
-    UFRAME_URL_BASE:        '/sensor/inv'
-    UFRAME_TOC:             '/sensor/inv/toc'
-    UFRAME_INST_BASE:       '/instrument/api'
-    UFRAME_PLAT_BASE:       '/platform/api'
-    UFRAME_TIMEOUT_CONNECT: 5
-    UFRAME_TIMEOUT_READ: 30
-    UFRAME_DATA_REQUEST_LIMIT: 2880
-    UFRAME_PLOT_TIMEOUT: 60
-    DATA_POINTS: 1000
-    # redmine
-    REDMINE_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    REDMINE_URL: 'https://redmine-asa.ooi.rutgers.edu' #'https://uframe-cm.ooi.rutgers.edu'
-    REDMINE_PROJECT_ID: 'ocean-observatory' #'ooi-ui-api-testing'
-    REDMINE_TRACKER: 'Support'
     # redis
     REDIS_URL: 'redis://localhost:6379'
-    # google
-    GOOGLE_ANALYTICS_URL: 'https://www.google-analytics.com/collect?v=1&tid=UA-50606390-3&cid=1&t=event'
-    # alfresco
-    ALFRESCO_CMIS_URL:  'https://alfresco.oceanobservatories.org/alfresco/s/api/cmis'
-    ALFRESCO_DL_URL:    'https://alfresco.oceanobservatories.org/alfresco/s/api/node/content/workspace/SpacesStore'
-    ALFRESCO_TICKET_URL: 'https://alfresco.oceanobservatories.org/alfresco/s/api/login'
-    ALFRESCO_LINK_URL:  'https://alfresco.oceanobservatories.org/alfresco/n/content/workspace/SpacesStore/'
-    ALFRESCO_REPO_ID:   'c161bc66-4f7e-4a4f-b5f2-aac9fbf1d3cd'
-    ALFRESCO_USERNAME:  'admin'
-    ALFRESCO_PASSWORD:  'admin'
-    # cilogon
-    CILOGON_ID: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    CILOGON_SECRECT:  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    CILOGON_BASE_URL: 'https://test.cilogon.org'
-    # camera store
-    IMAGE_STORE : 'ooiservices/cam_images'
-    IMAGE_CAMERA_STORE : 'http://opendap-devel.ooi.rutgers.edu:8080/opendap/hyrax/large_format/'
     # flask security - email parameters
     SECURITY_EMAIL_SENDER : 'no-reply@ooi.rutgers.edu'
     MAIL_SERVER : 'localhost'
