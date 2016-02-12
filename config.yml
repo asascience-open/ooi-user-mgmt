@@ -1,0 +1,67 @@
+ENV_NAME: 'LOCAL_DEVELOPMENT'
+
+COMMON: &common
+    # Logging
+    LOGGING: True
+    LOG_FILE_PTAH: '/logs/'
+    LOG_FILE: 'ooi-ui-mgmt.log'
+    # Server config
+    DEPLOYMENT_SCENARIO: LOCAL_DEVELOPMENT
+    SECRET_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    UI_API_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    SSL_DISABLE: False
+    JSONIFY_PRETTYPRINT_REGULAR: true
+    # sql / db config
+    SQLALCHEMY_COMMIT_ON_TEARDOWN: True
+    SQLALCHEMY_RECORD_QUERIES: True
+    OOI_SLOW_DB_QUERY_TIME: 0.5
+    DB_SCHEMA: 'ooiui'
+    # server dns/port config
+    UI_URL: 'http://localhost:5000'
+    SERVER_DNS: 'localhost'
+    HOST: localhost
+    PORT: 4000
+    # redis
+    REDIS_URL: 'redis://localhost:6379'
+    # flask security - email parameters
+    SECURITY_EMAIL_SENDER : 'no-reply@ooi.rutgers.edu'
+    MAIL_SERVER : 'localhost'
+    MAIL_PORT : 465
+    MAIL_USE_SSL : True
+    MAIL_USERNAME : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    MAIL_PASSWORD : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    # flask security - main parameters
+    SECURITY_CONFIRMABLE : False
+    SECURITY_REGISTERABLE : False
+    SECURITY_RECOVERABLE : True
+    SECURITY_TRACKABLE : False
+    SECURITY_PASSWORD_HASH : 'pbkdf2_sha512'
+    SECURITY_PASSWORD_SALT : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+DEVELOPMENT: &development
+    <<: *common
+    DEBUG: True
+    SQLALCHEMY_DATABASE_URI: 'postgres://user:password@hostname/database_name'
+    SSL_DISABLE: True
+    WTF_CSRF_ENABLED: False
+
+LOCAL_DEVELOPMENT: &local_dev
+    <<: *common
+    DEBUG: True
+    SQLALCHEMY_DATABASE_URI: 'postgres://postgres:postgres@localhost/ooiuidev'
+    SSL_DISABLE: True
+    WTF_CSRF_ENABLED: False
+    TOEMAIL: 'name@email.com'
+
+TESTING_CONFIG: &testing
+    <<: *common
+    TESTING: True
+    SQLALCHEMY_DATABASE_URI: 'postgres://postgres:postgres@localhost/ooiuitest'
+    WTF_CSRF_ENABLED: False
+
+PRODUCTION: &production
+    <<: *common
+    SQLALCHEMY_DATABASE_URI: 'postgres://postgres:postgres@localhost/ooiuiprod'
+    SSL_DISABLE: False
+    WTF_CSRF_ENABLED: True
+    TOEMAIL: 'name@email.com'
