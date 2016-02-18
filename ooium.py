@@ -6,7 +6,7 @@ from flask_security.utils import encrypt_password
 from flask_environments import Environments
 from flask_mail import Mail
 from flask.ext import login
-from flask.ext.admin.base import MenuLink, Admin, BaseView, expose
+from flask.ext.admin.base import MenuLink, Admin, BaseView, expose, AdminIndexView
 from flask.ext.admin.contrib import sqla
 from wtforms import PasswordField
 import os
@@ -225,6 +225,15 @@ class User(UserMixin, db.Model):
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
+login_manager = login.LoginManager()
+login_manager.init_app(app)
+
+
+# Create user loader function
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.query(User).get(user_id)
+
 
 # Executes before the first request is processed.
 @app.before_first_request
@@ -262,29 +271,36 @@ def before_first_request():
 
 # Displays the home page.
 @app.route('/')
-@login_required
+# @login_required
 def index():
-    return redirect('admin')
+    #return redirect('admin')
     # return render_template('index.html')
+    if not login.current_user.is_authenticated:
+        return redirect(url_for('.login_view'))
+    return redirect('admin/users')
 
 
-@app.route('/login')
+@app.route('/admin/login')
 def login_view():
-    # login.login_user(User())
+    login.login_user(User())
     # return render_template('index.html')
-    return redirect(url_for('admin.index'))
+    return redirect(url_for('.index'))
 
 
-@app.route('/logout/')
+@app.route('/admin/logout/')
 def logout_view():
     login.logout_user()
-    return redirect(url_for('admin.index'))
+    if not login.current_user.is_authenticated:
+        return redirect(url_for('.login_view'))
+    return redirect(url_for('.index'))
 
 
-@app.route('/reset')
+@app.route('/admin/reset')
 def reset_password():
     login.logout_user()
-    return render_template('index.html')
+    if not login.current_user.is_authenticated:
+        return redirect(url_for('.login_view'))
+    return redirect(url_for('.index'))
 
 
 # Customized User model for SQL-Admin
@@ -339,11 +355,12 @@ class RoleAdmin(sqla.ModelView):
         return current_user.has_role('admin')
 
 # Initialize Flask-Admin
-admin = Admin(app, name='OOI User Admin')
+admin = Admin(app, name='OOI User Admin', url='/admin/users')
 
 # Add Flask-Admin views for Users and Roles
 admin.add_view(UserAdmin(User, db.session))
 admin.add_view(RoleAdmin(Role, db.session))
+
 
 
 # Create menu links classes with reloaded accessible
