@@ -1,7 +1,10 @@
 Ocean Observatories Initiative - User Management
 ===============
 
-A stand-alone application that enables the management of users, groups, roles, Redis and password recovery.
+A stand-alone application that enables the management of users, groups, roles, Redis and password recovery.  
+
+It is recommended to host this app on a separate ip address using https rewrite in nginx and limit access to the /admin/ route to
+certain IP users while leaving the /reset route open to the world.
 
 ### Setup
 
@@ -11,6 +14,11 @@ A stand-alone application that enables the management of users, groups, roles, R
     
     SECRET_KEY: <Must match>
     DB_SCHEMA: <Must match, 'ooiui' by default>
+    # server dns/port config
+    HOST: localhost
+    PORT: 5001
+    # redis
+    REDIS_URL: 'redis://localhost:6379'
     # flask security - email parameters
     SECURITY_EMAIL_SENDER : 'no-reply@ooi.rutgers.edu'
     MAIL_SERVER : 'localhost'
@@ -29,5 +37,9 @@ A stand-alone application that enables the management of users, groups, roles, R
 ### Launch
 
     python ooi-user-mgmt.py
+    
+    OR
+    
+    uwsgi --ini app.ini
 
 
