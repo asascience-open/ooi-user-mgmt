@@ -36,7 +36,7 @@ certain IP users while leaving the /reset route open to the world.
 
 ### Launch
 
-    python ooi-user-mgmt.py
+    python ooium.py
     
     OR
     
