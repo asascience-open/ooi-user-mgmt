@@ -1,4 +1,4 @@
-ENV_NAME: 'LOCAL_DEVELOPMENT'
+ENV_NAME: 'PRODUCTION'
 
 COMMON: &common
     # Logging
@@ -6,7 +6,7 @@ COMMON: &common
     LOG_FILE_PTAH: '/logs/'
     LOG_FILE: 'ooi-ui-mgmt.log'
     # Server config
-    DEPLOYMENT_SCENARIO: LOCAL_DEVELOPMENT
+    DEPLOYMENT_SCENARIO: PRODUCTION
     SECRET_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     UI_API_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     SSL_DISABLE: False
@@ -17,10 +17,8 @@ COMMON: &common
     OOI_SLOW_DB_QUERY_TIME: 0.5
     DB_SCHEMA: 'ooiui'
     # server dns/port config
-    UI_URL: 'http://localhost:5000'
-    SERVER_DNS: 'localhost'
     HOST: localhost
-    PORT: 4000
+    PORT: 5001
     # redis
     REDIS_URL: 'redis://localhost:6379'
     # flask security - email parameters
@@ -37,27 +35,6 @@ COMMON: &common
     SECURITY_TRACKABLE : False
     SECURITY_PASSWORD_HASH : 'pbkdf2_sha512'
     SECURITY_PASSWORD_SALT : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-
-DEVELOPMENT: &development
-    <<: *common
-    DEBUG: True
-    SQLALCHEMY_DATABASE_URI: 'postgres://user:password@hostname/database_name'
-    SSL_DISABLE: True
-    WTF_CSRF_ENABLED: False
-
-LOCAL_DEVELOPMENT: &local_dev
-    <<: *common
-    DEBUG: True
-    SQLALCHEMY_DATABASE_URI: 'postgres://postgres:postgres@localhost/ooiuidev'
-    SSL_DISABLE: True
-    WTF_CSRF_ENABLED: False
-    TOEMAIL: 'name@email.com'
-
-TESTING_CONFIG: &testing
-    <<: *common
-    TESTING: True
-    SQLALCHEMY_DATABASE_URI: 'postgres://postgres:postgres@localhost/ooiuitest'
-    WTF_CSRF_ENABLED: False
 
 PRODUCTION: &production
     <<: *common

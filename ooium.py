@@ -265,25 +265,22 @@ def before_first_request():
 @login_required
 def index():
     return redirect('admin')
-    # return render_template('index.html')
 
 
 @app.route('/login')
 def login_view():
-    # login.login_user(User())
-    # return render_template('index.html')
     return redirect(url_for('admin.index'))
 
 
 @app.route('/logout/')
 def logout_view():
     login.logout_user()
-    return redirect(url_for('admin.index'))
+    return redirect(url_for('.index'))
 
 
 @app.route('/reset')
 def reset_password():
-    login.logout_user()
+    # login.logout_user()
     return render_template('index.html')
 
 
